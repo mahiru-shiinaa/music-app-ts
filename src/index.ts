@@ -1,8 +1,9 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express} from "express";
 import dotenv from "dotenv";
- import * as database from "./config/database";
-
+import * as database from "./config/database";
+import path from "path";
 import cookieParser from "cookie-parser";
+import clientRoutes from "./routes/client/index.route";
 
 // Khai báo app
 const app: Express = express();
@@ -15,7 +16,7 @@ database.connect();
 
 
 // Dùng khi cài bug
-app.set("views", "./views");
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
 // Middleware để đọc body từ client, không cần body-parser nâng cao
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true })); // Nếu dùng form HTML gửi 
 //  dùng khi muốn res.cookie
 app.use(cookieParser());
 
-
+clientRoutes(app);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);

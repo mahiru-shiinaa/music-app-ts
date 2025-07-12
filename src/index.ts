@@ -19,6 +19,9 @@ database.connect();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
+// Nhúng file tĩnh
+app.use(express.static(path.join(__dirname, "public")));
+
 
 
 // Middleware để đọc body từ client, không cần body-parser nâng cao

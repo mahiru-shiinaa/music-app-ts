@@ -45,9 +45,42 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       });
       item.singerInfo = singer;
     }
-    console.log('singerInfo', songs);
     res.render("client/pages/songs/list.pug", { pageTitle: topic.title || "", songs, topic });
   } catch (error) {
     console.log(error);
   }
 };
+
+export const detail = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const song = await Song.findOne({
+      slug: req.params.slugSong,
+      status: "active",
+      deleted: false,
+    });
+    if (!song) {
+      res.status(404).send("Song not found");
+      return;
+    }
+    const singer = await Singer.findOne({
+      _id: song.singerId,
+      deleted: false
+    }).select("fullName avatar");
+    if (!singer) {
+      res.status(404).send("Singer not found");
+      return;
+    }
+    const topic = await Topic.findOne({
+      _id: song.topicId,
+      deleted: false
+    }).select("title");
+    if (!topic) {
+      res.status(404).send("Topic not found");
+      return;
+    }
+
+    res.render("client/pages/songs/detail.pug", { pageTitle: song.title || "", song, singer, topic });
+  } catch (error) {
+    console.log(error);
+  }
+}; 

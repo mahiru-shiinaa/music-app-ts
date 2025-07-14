@@ -151,6 +151,20 @@
   font-weight: 900;
 }
 
+.singer-detail .inner-actions .inner-heart {
+  cursor: pointer;
+}
+.singer-detail .inner-actions .inner-heart.active {
+  color: red;
+}
+.singer-detail .inner-actions .inner-heart i {
+  color: red;
+}
+.singer-detail .inner-actions .inner-heart.active i {
+  color: red;
+  font-weight: 900;
+}
+
 .singer-detail .inner-play {
   display: flex;
   gap: 20px;

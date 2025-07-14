@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Topic from "../../models/client/topic.model";
 import Song from "../../models/client/song.model";
 import Singer from "../../models/client/singer.model";
+import FavoriteSong from "../../models/client/favorite-song.model";
 
 export const index = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -82,12 +83,17 @@ export const detail = async (req: Request, res: Response): Promise<void> => {
       res.status(404).send("Topic not found");
       return;
     }
-
+    const favoriteSong = await FavoriteSong.findOne({
+      songId: song.id,
+      deleted: false,
+    })
+    const  isFavorite = favoriteSong ? true : false;
     res.render("client/pages/songs/detail.pug", {
       pageTitle: song.title || "",
       song,
       singer,
       topic,
+      isFavorite,
     });
   } catch (error) {
     console.log(error);
@@ -119,6 +125,41 @@ export const like = async (req: Request, res: Response): Promise<void> => {
       code: 200,
       message: "Thích bài hát thành công",
       like: song.like,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const favorite = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idSong: string = req.params.idSong;
+    const typeFavorite: string = req.params.typeFavorite;
+    switch (typeFavorite) {
+      case "favorite":
+        const exitFavoriteSong = await FavoriteSong.findOne({
+          songId: idSong,
+          deleted: false,
+        });
+        if (!exitFavoriteSong) {
+          const favoriteSong = new FavoriteSong({
+            // userId: "",
+            songId: idSong,
+          });
+          await favoriteSong.save();
+        }
+        break;
+      case "unfavorite":
+        await FavoriteSong.findOneAndDelete({
+          songId: idSong,
+        });
+        break;
+      default:
+        break;
+    }
+    res.json({
+      code: 200,
+      message: "Lưu bài hát thành công",
     });
   } catch (error) {
     console.log(error);

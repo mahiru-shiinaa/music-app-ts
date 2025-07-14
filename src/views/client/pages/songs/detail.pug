@@ -20,7 +20,7 @@ block main
             .inner-action.inner-like(button-like=song.id)
               i.fa-regular.fa-thumbs-up
               |  <span>#{song.like} thích</span>
-            .inner-action.inner-heart
+            div(class=["inner-action", "inner-heart", isFavorite ? "active" : ""] button-favorite=song.id)
               i.fa-regular.fa-heart
               |  Bài hát yêu thích
 
@@ -28,7 +28,7 @@ block main
             .inner-avatar
               img(src=song.avatar, alt="Song Image")
             .inner-audio
-              
+
               div(id="aplayer" data-song=song data-singer=singer)
               //- audio(controls)
               //-   source(src="https://backend.daca.vn/assets/audios/cat-doi-noi-sau.mp3")

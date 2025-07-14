@@ -31,7 +31,7 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       })
         .select("avatar title slug singerId like")
         .lean()) as unknown as SongWithSinger[]) || [];
-    
+
     if (!songs) {
       res.status(404).send("Song not found");
       return;
@@ -45,7 +45,11 @@ export const index = async (req: Request, res: Response): Promise<void> => {
       });
       item.singerInfo = singer;
     }
-    res.render("client/pages/songs/list.pug", { pageTitle: topic.title || "", songs, topic });
+    res.render("client/pages/songs/list.pug", {
+      pageTitle: topic.title || "",
+      songs,
+      topic,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -64,7 +68,7 @@ export const detail = async (req: Request, res: Response): Promise<void> => {
     }
     const singer = await Singer.findOne({
       _id: song.singerId,
-      deleted: false
+      deleted: false,
     }).select("fullName avatar");
     if (!singer) {
       res.status(404).send("Singer not found");
@@ -72,15 +76,51 @@ export const detail = async (req: Request, res: Response): Promise<void> => {
     }
     const topic = await Topic.findOne({
       _id: song.topicId,
-      deleted: false
+      deleted: false,
     }).select("title");
     if (!topic) {
       res.status(404).send("Topic not found");
       return;
     }
 
-    res.render("client/pages/songs/detail.pug", { pageTitle: song.title || "", song, singer, topic });
+    res.render("client/pages/songs/detail.pug", {
+      pageTitle: song.title || "",
+      song,
+      singer,
+      topic,
+    });
   } catch (error) {
     console.log(error);
   }
-}; 
+};
+
+export const like = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idSong: string = req.params.idSong;
+    const typeLike: string = req.params.typeLike;
+    const song = await Song.findOne({
+      _id: idSong,
+      deleted: false,
+    });
+    if (!song) {
+      res.status(404).send("Song not found");
+      return;
+    }
+    // if(song.like) song.like += 1;
+    // else song.like = 1;
+    // await song.save();
+    if (typeLike === "like") {
+      if (song.like) song.like += 1;
+    } else {
+      if (song.like) song.like -= 1;
+    }
+    await song.save();
+    res.json({
+      code: 200,
+      message: "Thích bài hát thành công",
+      like: song.like,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

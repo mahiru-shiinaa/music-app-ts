@@ -2,8 +2,11 @@ import { Request, Response } from "express";
 import Song from "../../models/client/song.model";
 import Singer from "../../models/client/singer.model";
 import { convertToSlug } from "../../helpers/convertToSlug";
+
+
 export const result = async (req: Request, res: Response): Promise<void> => {
   try {
+    const type = req.params.type;
     const keyword: string = `${req.query.keyword}`;
     let newSongs: Array<any> = [];
 
@@ -14,7 +17,7 @@ export const result = async (req: Request, res: Response): Promise<void> => {
       // Tạo ra slug không dấu, thêm dấu - thay dấu cách
       const stringSlug = convertToSlug(keyword);
       const stringSlugReg = new RegExp(stringSlug, "i");
-      const songs = await Song.find({ $or: [{ title: keywordReg }, { slug: stringSlugReg }], deleted: false }).lean().select("title singerId id avatar like");
+      const songs = await Song.find({ $or: [{ title: keywordReg }, { slug: stringSlugReg }], deleted: false }).lean().select("title singerId id avatar like slug");
       newSongs = await Promise.all(
         songs.map(async (song) => {
           const singer = await Singer.findOne({ _id: song.singerId }).select("fullName avatar");
@@ -22,13 +25,27 @@ export const result = async (req: Request, res: Response): Promise<void> => {
         })
       );
     }
-    res.render("client/pages/search/result", {
+   
+    switch (type) {
+      case "result":
+         res.render("client/pages/search/result", {
       pageTitle: "Kết quản tìm kiếm: " + keyword,
       keyword,
       songs: newSongs,
     });
+        break;
+    
+      case "suggest":
+         res.json(newSongs);
+        break;
+    
+      default:
+        break;
+    }
   } catch (error) {
      console.log("Lỗi khi tìm kiếm bài hát:", error);
     res.status(500).send("Đã xảy ra lỗi server");
   }
 };
+
+

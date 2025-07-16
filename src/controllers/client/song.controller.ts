@@ -165,3 +165,32 @@ export const favorite = async (req: Request, res: Response): Promise<void> => {
     console.log(error);
   }
 };
+
+export const listen = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const idSong: string = req.params.idSong;
+    const song = await Song.findOne({
+      _id: idSong,
+      deleted: false,
+    });
+    if (!song) {
+      res.status(404).send("Song not found");
+      return;
+    }
+    if (song.listen) song.listen += 1;
+    else song.listen = 1;
+    await song.save();
+    const songNew = await Song.findOne({ _id: idSong, deleted: false });
+    if(!songNew) {
+      res.status(404).send("Song not found");
+      return;
+    }; 
+    res.json({
+      code: 200,
+      message: "Nghe bài hát thành công",
+      listen: songNew.listen,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};

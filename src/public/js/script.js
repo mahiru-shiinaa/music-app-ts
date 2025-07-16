@@ -25,6 +25,18 @@ if (aplayer) {
     ap.on("pause", () => {
       avatar.style.animation = "none";
     });
+    ap.on("ended", () => {
+      const link = `/songs/listen/${dataSong._id}`;
+      const options = { method: "PATCH" };
+      fetch(link, options)
+        .then((response) => response.json())
+        .then((data) => {
+          const listen = document.querySelector(".inner-listen span");
+          listen.innerHTML = `${data.listen} lượt nghe`;
+
+          buttonLike.classList.toggle("active");
+        });
+    });
   }
 }
 
@@ -72,3 +84,44 @@ if (listButtonFavorite.length > 0) {
   });
 }
 //End Button Like
+
+// Search Suggest
+const boxSearch = document.querySelector(".box-search");
+if (boxSearch) {
+  const input = boxSearch.querySelector("input[name='keyword']");
+  const boxSuggest = boxSearch.querySelector(".inner-suggest");
+  input.addEventListener("keyup", async () => {
+    const keyword = input.value;
+    const link = `/search/suggest/?keyword=${keyword}`;
+    const options = { method: "GET" };
+    fetch(link, options)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.length > 0) {
+          boxSuggest.classList.add("show");
+          const htmls = data.map((song) => {
+            return ` 
+            <a class="inner-item" href="/songs/detail/${song.slug}">
+              <div class="inner-image">
+                <img src="${song.avatar}" />
+              </div>
+              <div class="inner-info">
+                <div class="inner-title">${song.title}</div>
+                <div class="inner-singer">
+                  <i class="fa-solid fa-microphone-lines"></i> ${song.singer.fullName}
+                </div>
+              </div>
+            </a>   
+            `;
+          });
+          const boxList = boxSuggest.querySelector(".inner-list");
+          boxList.innerHTML = htmls.join("");
+        } else {
+          boxSuggest.classList.remove("show");
+        }
+        // const innerSuggest = boxSearch.querySelector(".inner-suggest");
+        // innerSuggest.innerHTML = data.html;
+      });
+  });
+}
+//End Search Suggest

@@ -9,8 +9,8 @@ router.get("/", songController.index);
 router.get("/create", songController.create);
 router.post(
   "/create",
-  upload.single("avatar"),
-  uploadCloud.uploadSingle,
+  upload.fields([{ name: "avatar", maxCount: 1 }, { name:"audio", maxCount: 1 }]),
+  uploadCloud.uploadFields,
   songController.createPost
 );
 

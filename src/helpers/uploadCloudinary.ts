@@ -12,6 +12,7 @@ cloudinary.config({
 const streamUpload = (buffer: Buffer): Promise<UploadApiResponse> => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
+ { resource_type: "auto" }, // ✅ THÊM DÒNG NÀY ĐỂ TẢI LÊN AUDIO
       (error, result) => {
         if (result) {
           resolve(result);

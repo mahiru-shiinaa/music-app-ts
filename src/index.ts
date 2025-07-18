@@ -1,5 +1,8 @@
 import express, { Express} from "express";
 import dotenv from "dotenv";
+// Cấu hình .env
+dotenv.config();
+
 import * as database from "./config/database";
 import path from "path";
 import cookieParser from "cookie-parser";
@@ -11,8 +14,7 @@ import { systemConfig } from "./config/config";
 const app: Express = express();
 const port: number | string = process.env.PORT || 3000;
 
-// Cấu hình .env
-dotenv.config();
+
 //Kết nối Database
 database.connect();
 

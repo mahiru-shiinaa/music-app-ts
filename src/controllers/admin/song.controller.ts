@@ -25,3 +25,24 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
   
 }
+
+export const createPost = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const dataSong = {
+      title: req.body.title || "",
+      topicId: req.body.topicId || "",
+      singerId: req.body.singerId || "",
+      avatar: req.body.avatar || "",
+      status: req.body.status || "",
+      description: req.body.description || "",
+    }
+
+    const song = new Song(dataSong);
+    await song.save();
+    res.redirect("/admin/songs");
+    
+  } catch (error) {
+    
+  }
+  
+}

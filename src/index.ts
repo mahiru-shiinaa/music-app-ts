@@ -22,7 +22,8 @@ app.locals.prefixAdmin = systemConfig.prefixAdmin;
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 
-app.use('/tinymce', express.static(path.join(__dirname, 'node_modules', 'tinymce')));
+app.use('/tinymce', express.static(path.join(__dirname, '..', 'node_modules', 'tinymce')));
+
 
 // Nhúng file tĩnh
 app.use(express.static(path.join(__dirname, "public")));

@@ -7,9 +7,22 @@ const upload = multer();
 
 router.get("/", songController.index);
 router.get("/create", songController.create);
+router.get("/edit/:id", songController.edit);
+router.patch(
+  "/edit/:id",
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "audio", maxCount: 1 },
+  ]),
+  uploadCloud.uploadFields,
+  songController.editPatch
+);
 router.post(
   "/create",
-  upload.fields([{ name: "avatar", maxCount: 1 }, { name:"audio", maxCount: 1 }]),
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "audio", maxCount: 1 },
+  ]),
   uploadCloud.uploadFields,
   songController.createPost
 );

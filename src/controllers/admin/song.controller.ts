@@ -31,7 +31,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const createPost = async (req: Request, res: Response): Promise<void> => {
   try {
     // Lấy các trường text từ body, nếu thiếu thì gán chuỗi rỗng (để tránh undefined)
-    const { title = "", topicId = "", singerId = "", status = "", description = "" } = req.body;
+    const { title = "", topicId = "", singerId = "", status = "", description = "", lyrics="" } = req.body;
 
     // Ép kiểu req.files để TypeScript hiểu đây là object có key là string, value là mảng file
     // Đây là kiểu phù hợp khi bạn dùng multer.fields([{ name: "audio" }, { name: "avatar" }])
@@ -57,7 +57,8 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
       status,
       description,
       audio,
-      avatar
+      avatar,
+      lyrics
     };
 
     // Tạo mới document trong MongoDB từ model Song
@@ -76,3 +77,62 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
     res.status(500).send("Có lỗi xảy ra trên server");
   }
 };
+
+export const edit = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const song = await Song.findOne({ _id: req.params.id, deleted: false });
+    const topics = await Topic.find({ deleted: false, status: "active" }).select("title");
+    const singers = await Singer.find({ deleted: false, status: "active" }).select("fullName avatar");
+    res.render("admin/pages/songs/edit", {pageTitle: "Chỉnh Sửa bài hát", topics, singers, song });
+  } catch (error) {
+    
+  }
+}
+
+export const editPatch = async (req: Request, res: Response): Promise<void> => {
+  try {
+        // Lấy các trường text từ body, nếu thiếu thì gán chuỗi rỗng (để tránh undefined)
+    const { title = "", topicId = "", singerId = "", status = "", description = "", lyrics="" } = req.body;
+
+    // Ép kiểu req.files để TypeScript hiểu đây là object có key là string, value là mảng file
+    // Đây là kiểu phù hợp khi bạn dùng multer.fields([{ name: "audio" }, { name: "avatar" }])
+    const files = req.files as { [key: string]: Express.Multer.File[] };
+
+    // Lấy filename của file audio (nếu có), ngược lại gán ""
+    const audio = files?.audio?.[0]?.filename || "";
+
+    // Lấy filename của file avatar (nếu có), ngược lại gán ""
+    const avatar = files?.avatar?.[0]?.filename || "";
+
+    interface Song {
+      title: string;
+      topicId: string;
+      singerId: string;
+      status: string;
+      description: string;
+      audio?: string;
+      avatar?: string;
+      lyrics: string;
+    }
+
+    // Gom tất cả dữ liệu lại thành một object để tạo mới
+    const updateSong : Song = {
+      title,
+      topicId,
+      singerId,
+      status,
+      description,
+      lyrics
+    };
+    if(audio != "") {
+      updateSong.audio = audio
+    }
+    if(avatar != "") {
+      updateSong.avatar = avatar
+    }
+    await Song.updateOne({ _id: req.params.id }, updateSong);
+    res.redirect(req.get("referer") || "/admin/songs");
+  } catch (error) {
+    
+  }
+}

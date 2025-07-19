@@ -6,6 +6,7 @@ dotenv.config();
 import * as database from "./config/database";
 import path from "path";
 import cookieParser from "cookie-parser";
+import methodOverride from "method-override";
 import clientRoutes from "./routes/client/index.route";
 import adminRoutes from "./routes/admin/index.route";
 import { systemConfig } from "./config/config";
@@ -19,7 +20,7 @@ const port: number | string = process.env.PORT || 3000;
 database.connect();
 
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
-
+app.use(methodOverride("_method"));
 // Dùng khi cài bug
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");

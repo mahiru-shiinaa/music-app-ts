@@ -2,6 +2,10 @@
 tinymce.init({
   selector: 'textarea.textarea-mce',
   plugins: 'link image code',
+  image_title: true,
+  images_upload_url: `/admin/upload`,
+  automatic_uploads: true,
+  file_picker_types: 'image',
   /* and here's our custom image picker*/
   file_picker_callback: (cb, value, meta) => {
     const input = document.createElement('input');
